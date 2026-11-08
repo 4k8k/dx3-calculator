@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#151923">
+<title>DX3rd 達成値・期待値計算機</title>
+<style>
+:root{color-scheme:dark;--bg:#11151e;--panel:#1d2431;--panel2:#222c3c;--edge:#374255;--text:#f2f5fb;--muted:#a8b6c9;--accent:#80dcda;--accent2:#ad9dff;--error:#ffb6a8}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 88% -10%,#27314d 0,transparent 33%),var(--bg);font-family:system-ui,-apple-system,"Hiragino Sans","Noto Sans JP",Meiryo,sans-serif;color:var(--text);line-height:1.55}main{max-width:960px;margin:0 auto;padding:22px 15px 50px}header{margin-bottom:17px}.kicker{color:var(--accent);font-size:.77rem;font-weight:800;letter-spacing:.1em}.title{font-size:clamp(1.3rem,4.3vw,2rem);letter-spacing:.01em;margin:4px 0}header p{color:var(--muted);margin:3px 0;font-size:.92rem}.panel{background:rgba(29,36,49,.97);border:1px solid var(--edge);border-radius:16px;padding:17px;margin-bottom:14px;box-shadow:0 8px 20px rgba(0,0,0,.09)}.panel h2{margin:0 0 12px;font-size:1.06rem}.field label{display:block;font-size:.81rem;font-weight:750;color:#c9d5e6;margin-bottom:5px}.form-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:11px}input{width:100%;background:#121823;color:#fff;border:1px solid #526075;border-radius:10px;padding:12px;font-size:1.05rem;min-height:46px;font-variant-numeric:tabular-nums}input:focus{outline:2px solid var(--accent);outline-offset:2px}.macro-row{display:flex;gap:9px;align-items:end;margin-bottom:16px}.macro-row .field{flex:1}.btn{cursor:pointer;border:1px solid #627287;border-radius:10px;background:#2d3a4c;color:#fff;font:inherit;font-weight:700;padding:11px 13px;min-height:44px;white-space:nowrap}.btn:hover,.btn:focus-visible{background:#3a4b62}.btn.primary{background:var(--accent);border-color:var(--accent);color:#10202b}.btn.primary:hover{background:#a2f0e6}.hint{font-size:.77rem;color:var(--muted);margin:9px 0 0}.error{color:var(--error);min-height:1.35rem;font-size:.83rem;margin-top:8px}.metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.metric{padding:13px;background:var(--panel2);border-radius:12px;border:1px solid #344158;min-width:0}.metric .label{display:block;color:var(--muted);font-size:.77rem}.metric .num{display:block;font-size:clamp(1.25rem,3.7vw,1.85rem);font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.035em}.metric .unit{font-size:.78rem;font-weight:600}.accent{color:var(--accent)}.purple{color:#c3baff}.secondary{font-size:.86rem;color:#bfcbda;margin:12px 0 0}.small-row{display:flex;gap:7px;flex-wrap:wrap;align-items:center}.thresholds{margin-top:15px;display:flex;flex-wrap:wrap;gap:7px}.chip{border:1px solid var(--edge);border-radius:7px;background:#252d3c;color:#d9e3ef;padding:6px 9px;font:inherit;font-size:.78rem;cursor:pointer}.chip:hover{background:#354259}.chip:focus-visible{outline:2px solid var(--accent)}.bar-row{display:grid;grid-template-columns:85px minmax(0,1fr) 60px;gap:9px;align-items:center;margin:8px 0;font-size:.83rem}.bar-label{text-align:right;font-variant-numeric:tabular-nums;color:#d2dced}.bar-track{background:#141b27;height:13px;border-radius:100px;overflow:hidden}.bar{height:100%;border-radius:100px;background:linear-gradient(90deg,var(--accent2),var(--accent));min-width:0}.bar-value{text-align:right;font-variant-numeric:tabular-nums;color:#b9c8da}.footer{margin-top:16px;color:var(--muted);font-size:.78rem}.footer b{color:#e7eff8}.footer p{margin:6px 0}.small-note{font-size:.83rem;color:var(--muted)}.action-row{display:flex;gap:9px;flex-wrap:wrap;margin-top:16px}.tag{display:inline-block;color:#a8f4e6;border:1px solid #37675f;border-radius:100px;font-size:.72rem;padding:3px 9px;margin-top:8px}#graph{min-height:155px}.no-js{background:#503431;padding:11px;border-radius:8px;color:#fff}@media(max-width:620px){.form-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.panel{padding:14px;border-radius:13px}.bar-row{grid-template-columns:70px minmax(0,1fr) 57px;gap:7px;font-size:.76rem}.macro-row{flex-direction:column;align-items:stretch}.macro-row .field{width:100%}.macro-row .btn{width:100%}main{padding:16px 11px 40px}}
+@media(prefers-reduced-motion:no-preference){.bar{transition:width .22s}}
+@media print{:root{color-scheme:light}body{background:#fff;color:#000}.panel,.metric{background:#fff;color:#000;box-shadow:none}.metric .num{color:#000}.btn,.thresholds{display:none}input{background:#fff;color:#000}.bar-track{background:#ddd}.bar{background:#555}.bar-label,.bar-value,.footer,.hint,.small-note,.metric .label{color:#333}}
+</style>
+</head>
+<body>
+<main>
+ <header>
+  <div class="kicker">DOUBLE CROSS 3RD EDITION / PROBABILITY</div>
+  <h1 class="title">達成値・期待値計算機</h1>
+  <p>ダイス数・クリティカル値・固定値から、達成値分布を数学的に計算します。</p>
+  <span class="tag">外部ライブラリ不要 / 通信なし / 個人制作・非公式</span>
+ </header>
+ <section class="panel" aria-label="判定条件">
+  <h2>判定条件</h2>
+  <div class="macro-row">
+   <div class="field"><label for="macro">判定式</label><input id="macro" type="text" value="10DX7+4" autocomplete="off" spellcheck="false" aria-describedby="macrohelp"></div>
+   <button class="btn primary" id="apply" type="button">判定式を反映</button>
+  </div>
+  <p id="macrohelp" class="hint" style="margin-top:-10px;margin-bottom:14px">例：10DX7+4 / 10DX7 / 10dx+4@7（ココフォリア式）</p>
+  <div class="form-grid">
+   <div class="field"><label for="dice">ダイス数</label><input id="dice" type="number" min="1" max="1000" step="1" value="10"></div>
+   <div class="field"><label for="critical">C値</label><input id="critical" type="number" min="2" max="10" step="1" value="7"></div>
+   <div class="field"><label for="bonus">固定値</label><input id="bonus" type="number" min="-1000" max="1000" step="1" value="4"></div>
+   <div class="field"><label for="target">目標達成値</label><input id="target" type="number" min="-1000" max="9999" step="1" value="30"></div>
+  </div>
+  <div class="error" id="error" role="alert" aria-live="polite"></div>
+ </section>
+ <section class="panel" aria-label="計算結果">
+  <h2>計算結果 <span class="small-note" id="formula"></span></h2>
+  <div class="metrics">
+   <div class="metric"><span class="label">期待値（平均）</span><span class="num" id="mean">—</span></div>
+   <div class="metric"><span class="label">中央値</span><span class="num" id="median">—</span></div>
+   <div class="metric"><span class="label">90%点</span><span class="num purple" id="p90">—</span></div>
+   <div class="metric"><span class="label" id="targetlabel">30以上の確率</span><span class="num accent" id="success">—</span></div>
+  </div>
+  <p class="secondary" id="range">—</p>
+  <div class="thresholds" aria-label="目標達成値の変更">
+   <span class="small-note">目標を選択：</span>
+   <button class="chip" data-t="10">10+</button><button class="chip" data-t="20">20+</button><button class="chip" data-t="30">30+</button><button class="chip" data-t="40">40+</button><button class="chip" data-t="50">50+</button><button class="chip" data-t="100">100+</button>
+  </div>
+  <div class="action-row"><button class="btn" id="copy" type="button">結果をコピー</button><button class="btn" type="button" id="reset">初期条件に戻す</button></div>
+ </section>
+ <section class="panel" aria-label="達成値の分布">
+  <h2>達成値の分布</h2>
+  <div class="small-note">10刻みを基本にまとめています。棒の長さは各範囲に入る確率です。</div>
+  <div id="graph" role="img" aria-label="達成値分布の棒グラフ"></div>
+ </section>
+ <section class="panel">
+  <h2>計算上の扱い</h2>
+  <p class="small-note">各ダイスは独立に振り足されるものとして、すべての出目の確率分布を計算。初回のダイスがすべて1の場合はファンブルで達成値0とし、固定値も加算しません。クリティカル回数に上限は設けず、十分小さい確率の末尾のみ計算機の精度上切り捨てます（合計確率の誤差は約10⁻¹³以下）。</p>
+  <p class="small-note">「目標達成値以上の確率」は単独の達成値の比較です。対決で同値になった場合の処理、ダイスの振り直し、特殊なエフェクト、ダイス数0以下の判定などは対象外です。C値2～10、ダイス数1～1000に対応。</p>
+  <div class="footer"><p><b>オフライン利用：</b>HTML本体だけで計算します。PCでは保存したファイルをブラウザで開けます。iPhoneの「ファイル」アプリ内プレビューではJavaScriptが動かない場合があるため、対応ブラウザやWebアプリとして開いてください。</p><p>『ダブルクロス The 3rd Edition』の非公式ファン制作計算ツール。各種名称の権利は各権利者に帰属します。</p></div>
+ </section>
+</main>
+<noscript><div class="no-js">この計算機にはJavaScriptが必要です。JavaScriptが有効なブラウザで開いてください。</div></noscript>
+<script>
+(function(){
+ 'use strict';
+ const $=id=>document.getElementById(id);
+ const getNum=id=>Number($(id).value);
+ let latest=null;
+ const ROUND=(x,d)=>Number(x.toFixed(d)).toLocaleString('ja-JP',{minimumFractionDigits:d,maximumFractionDigits:d});
+ function valid(d,c,b,t){return Number.isInteger(d)&&d>=1&&d<=1000&&Number.isInteger(c)&&c>=2&&c<=10&&Number.isInteger(b)&&Math.abs(b)<=1000&&Number.isInteger(t)&&t>=-1000&&t<=9999;}
+ function probabilityDistribution(d,c,b){
+  const q=(11-c)/10, outcomes=new Map();
+  let last=0;
+  let terminalMass=0;
+  for(let k=0;k<5000;k++){
+   const qk=Math.pow(q,k);
+   for(let r=1;r<c;r++){
+    const f=(1-qk+qk*r/10);
+    const current=Math.pow(Math.max(0,Math.min(1,f)),d);
+    const p=Math.max(0,current-last);
+    const s=k*10+r;
+    const value=s===1?0:s+b;
+    outcomes.set(value,(outcomes.get(value)||0)+p);
+    last=current;
+   }
+   terminalMass=1-last;
+   if(terminalMass<1e-13)break;
+  }
+  const sorted=[...outcomes].map(([value,p])=>({value,p})).sort((a,b)=>a.value-b.value);
+  const total=sorted.reduce((sum,e)=>sum+e.p,0);
+  if(total<=0)throw Error('数値計算に失敗しました');
+  // 端数誤差・打ち切り尾部に対して全体を正規化する。
+  for(const e of sorted)e.p/=total;
+  let mean=0,mode=null,modeP=-1;
+  for(const e of sorted){mean+=e.value*e.p;if(e.p>modeP){mode=e.value;modeP=e.p;}}
+  function quantile(alpha){let acc=0;for(const e of sorted){acc+=e.p;if(acc>=alpha-1e-14)return e.value;}return sorted[sorted.length-1].value;}
+  function reach(target){let p=0;for(const e of sorted)if(e.value>=target)p+=e.p;return p;}
+  return {sorted,mean,mode,median:quantile(.5),q10:quantile(.10),q90:quantile(.90),q99:quantile(.99),reach};
+ }
+ function summarize(){
+  const d=getNum('dice'),c=getNum('critical'),b=getNum('bonus'),t=getNum('target');
+  if(!valid(d,c,b,t)){$('error').textContent='入力値を確認してください。ダイス1～1000、C値2～10、固定値−1000～1000、目標−1000～9999に対応します。';return;}
+  $('error').textContent='';
+  try{
+   const p=probabilityDistribution(d,c,b);
+   latest={d,c,b,t,p};
+   const bonus=b>0?'+'+b:b<0?String(b):'';
+   $('formula').textContent=`${d}DX${c}${bonus}`;
+   $('mean').textContent=ROUND(p.mean,2);
+   $('median').textContent=p.median.toLocaleString('ja-JP');
+   $('p90').textContent=p.q90.toLocaleString('ja-JP');
+   $('targetlabel').textContent=t+'以上の確率';
+   $('success').textContent=(p.reach(t)*100).toFixed(2)+'%';
+   $('range').textContent=`結果の中央80%は、おおむね ${p.q10}～${p.q90} の範囲です（10～90パーセンタイル）。`;
+   $('macro').value=`${d}DX${c}${bonus}`;
+   graph(p);
+  }catch(ex){$('error').textContent='計算中に問題が発生しました。入力値を調整してください。';console.error(ex);}
+ }
+ function graph(p){
+  const container=$('graph');container.replaceChildren();
+  const start=10*Math.floor(Math.min(0,p.q10)/10);
+  const span=Math.max(10,p.q99-start);
+  const width=10*Math.max(1,Math.ceil(span/120));
+  let bins=[];
+  for(let s=start;s<start+width*11;s+=width){bins.push({min:s,max:s+width-1,p:0});}
+  bins.push({min:start+width*11,max:Infinity,p:0});
+  for(const {value, p:prob} of p.sorted){let idx=Math.floor((value-start)/width);idx=Math.max(0,Math.min(idx,bins.length-1));bins[idx].p+=prob;}
+  const max=Math.max(...bins.map(a=>a.p),1e-14);
+  const frag=document.createDocumentFragment();
+  for(const bin of bins){
+   if(bin.p<.0000005&&bin.max!==Infinity)continue;
+   const row=document.createElement('div');row.className='bar-row';
+   const l=document.createElement('span');l.className='bar-label';l.textContent=bin.max===Infinity?`${bin.min}以上`:`${bin.min}～${bin.max}`;
+   const tr=document.createElement('div');tr.className='bar-track';const bar=document.createElement('div');bar.className='bar';bar.style.width=(100*bin.p/max)+'%';tr.append(bar);
+   const v=document.createElement('span');v.className='bar-value';v.textContent=(bin.p*100).toFixed(1)+'%';
+   row.append(l,tr,v);frag.append(row);
+  }
+  container.append(frag);
+ }
+ function parseMacro(text){
+  const v=text.replace(/\s/g,'').toUpperCase().replace(/[−－]/g,'-');
+  let m=v.match(/^(\d{1,4})DX(\d{1,2})([+-]\d{1,4})?$/);
+  if(m)return {d:+m[1],c:+m[2],b:+(m[3]||0)};
+  m=v.match(/^(\d{1,4})DX([+-]\d{1,4})?@(\d{1,2})$/);
+  if(m)return {d:+m[1],c:+m[3],b:+(m[2]||0)};
+  return null;
+ }
+ function apply(){
+  const p=parseMacro($('macro').value);
+  if(!p){$('error').textContent='判定式は「10DX7+4」または「10dx+4@7」形式で入力してください。';return;}
+  $('dice').value=p.d;$('critical').value=p.c;$('bonus').value=p.b;
+  summarize();
+ }
+ $('apply').addEventListener('click',apply);
+ $('macro').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();apply();}});
+ for(const id of ['dice','critical','bonus','target'])$(id).addEventListener('change',summarize);
+ for(const chip of document.querySelectorAll('[data-t]'))chip.addEventListener('click',()=>{$('target').value=chip.dataset.t;summarize();});
+ $('reset').addEventListener('click',()=>{$('dice').value=10;$('critical').value=7;$('bonus').value=4;$('target').value=30;summarize();});
+ $('copy').addEventListener('click',async()=>{
+  if(!latest)return;
+  const {d,c,b,t,p}=latest, modifier=b>0?'+'+b:b<0?String(b):'';
+  const text=`DX3rd ${d}DX${c}${modifier}\n期待値 ${p.mean.toFixed(2)} / 中央値 ${p.median} / 90%点 ${p.q90}\n達成値${t}以上 ${(p.reach(t)*100).toFixed(2)}%\n中央80%の範囲 ${p.q10}～${p.q90}`;
+  const btn=$('copy');
+  try{if(navigator.clipboard&&navigator.clipboard.writeText){await navigator.clipboard.writeText(text);}else{let ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.opacity='0';document.body.append(ta);ta.select();if(!document.execCommand('copy'))throw Error('copy');ta.remove();}btn.textContent='コピーしました';}catch(e){window.prompt('計算結果をコピーしてください',text);btn.textContent='結果をコピー';}
+  setTimeout(()=>{btn.textContent='結果をコピー';},1800);
+ });
+ summarize();
+})();
+</script>
+</body>
+</html>
